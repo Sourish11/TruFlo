@@ -103,9 +103,9 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
   };
 
   return (
-    <Modal className= " flex justify-center" isOpen={isOpen} onClose={onClose}>
-      <div className="min-w-[50rem] max-w-6xl mx-auto max-h-[95vh] overflow-y-auto">
-        <Card className="w-[100%] glass-enhanced shadow-2xl border-2 border-white/20 overflow-hidden">
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="w-full max-w-6xl mx-auto max-h-[95vh] overflow-y-auto">
+        <Card className="glass-enhanced shadow-2xl border-2 border-white/20 overflow-hidden">
           <ModalHeader onClose={onClose}>
             <h3 className="text-2xl font-bold text-white drop-shadow-md font-heading">
               Experience TruFlo
@@ -128,26 +128,26 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
               </div>
               
               {/* Enhanced mood selection grid */}
-              <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {moods.map((mood, index) => (
                   <button
                     key={index}
                     onClick={() => handleMoodSelect(mood)}
-                    className={`min-w-[8rem]  group relative flex items-center justify-center p-6 rounded-3xl transition-all duration-500 transform hover:scale-105 border-2 overflow-hidden ${
+                    className={`group relative p-6 rounded-3xl transition-all duration-500 transform hover:scale-105 border-2 overflow-hidden ${
                       selectedMood?.label === mood.label 
                         ? `border-white/60 bg-gradient-to-br ${mood.gradient} shadow-2xl ${mood.shadow} scale-105` 
                         : 'border-white/20 hover:border-white/40 glass-button hover:shadow-xl'
                     } ${isAnimating && selectedMood?.label === mood.label ? 'animate-pulse' : ''}`}
                   >
                     {/* Background gradient overlay */}
-                    <div className={`absolute inset-0  bg-gradient-to-br ${mood.gradient}  opacity-0 group-hover:opacity-100 transition-opacity duration-300 `} />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${mood.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                     
                     {/* Content */}
-                    <div className="relative z-10 text-center scale-90">
+                    <div className="relative z-10 text-center">
                       <div className="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">
                         {mood.emoji}
                       </div>
-                      <div className="text-white font-bold text-md mb-2 drop-shadow-md font-heading">
+                      <div className="text-white font-bold text-lg mb-2 drop-shadow-md font-heading">
                         {mood.label}
                       </div>
                       <div className="text-white/70 text-sm leading-relaxed font-body">
@@ -163,7 +163,7 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
                     )}
 
                     {/* Hover glow effect */}
-                    <div className={`absolute inset-0  rounded-3xl bg-gradient-to-br ${mood.color}  opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl`} />
+                    <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${mood.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl`} />
                   </button>
                 ))}
               </div>
@@ -196,11 +196,9 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {getMoodTasks(selectedMood).map((task, i) => (
-                            <div className="flex items-center justify-center p-3 bg-white/10 rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300 group cursor-pointer">
-                              <div key={i} >
-                                <span className="text-green-400 mr-3 text-lg group-hover:scale-110 transition-transform duration-300">✓</span>
-                                <span className="text-white/90 font-medium text-sm font-body">{task}</span>
-                              </div>
+                            <div key={i} className="flex items-center p-3 bg-white/10 rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300 group cursor-pointer">
+                              <span className="text-green-400 mr-3 text-lg group-hover:scale-110 transition-transform duration-300">✓</span>
+                              <span className="text-white/90 font-medium text-sm font-body">{task}</span>
                             </div>
                           ))}
                         </div>
