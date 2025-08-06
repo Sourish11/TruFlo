@@ -84,10 +84,10 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
 
   const getMoodQuote = (mood) => {
     const quotes = {
-      'Energized': "Perfect! Let's channel that energy into crushing your goals today!",
-      'Focused': "Great mindset! You're ready to tackle complex tasks with clarity.",
-      'Meh': "We all have these days. Let's start with something small and build momentum.",
-      'Overwhelmed': "Take a breath. Let's break things down into manageable pieces."
+      'Energized': "Perfect! Let's channel that energy into crushing your goals today! 🚀",
+      'Focused': "Great mindset! You're ready to tackle complex tasks with clarity. 🎯",
+      'Meh': "We all have these days. Let's start with something small and build momentum. 💪",
+      'Overwhelmed': "Take a breath. Let's break things down into manageable pieces. 🌱"
     };
     return quotes[mood?.label] || '';
   };
@@ -103,9 +103,9 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-full max-w-6xl mx-auto max-h-[95vh] overflow-y-auto">
-        <Card className="glass-enhanced shadow-2xl border-2 border-white/20 overflow-hidden">
+    <Modal className= " flex justify-center" isOpen={isOpen} onClose={onClose}>
+      <div className="min-w-[50rem] max-w-6xl mx-auto max-h-[95vh] overflow-y-auto">
+        <Card className="w-[100%] glass-enhanced shadow-2xl border-2 border-white/20 overflow-hidden">
           <ModalHeader onClose={onClose}>
             <h3 className="text-2xl font-bold text-white drop-shadow-md font-heading">
               Experience TruFlo
@@ -123,31 +123,31 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
                   How are you feeling right now?
                 </h4>
                 <p className="text-white/80 text-lg max-w-3xl mx-auto leading-relaxed font-body">
-                  Your mood shapes your productivity. Let's see what we can do to help you get started!
+                  Your mood shapes your productivity. Let's find the perfect tasks for how you're feeling today.
                 </p>
               </div>
               
               {/* Enhanced mood selection grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {moods.map((mood, index) => (
                   <button
                     key={index}
                     onClick={() => handleMoodSelect(mood)}
-                    className={`group relative p-6 rounded-3xl transition-all duration-500 transform hover:scale-105 border-2 overflow-hidden ${
+                    className={`min-w-[8rem]  group relative flex items-center justify-center p-6 rounded-3xl transition-all duration-500 transform hover:scale-105 border-2 overflow-hidden ${
                       selectedMood?.label === mood.label 
                         ? `border-white/60 bg-gradient-to-br ${mood.gradient} shadow-2xl ${mood.shadow} scale-105` 
                         : 'border-white/20 hover:border-white/40 glass-button hover:shadow-xl'
                     } ${isAnimating && selectedMood?.label === mood.label ? 'animate-pulse' : ''}`}
                   >
                     {/* Background gradient overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${mood.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    <div className={`absolute inset-0  bg-gradient-to-br ${mood.gradient}  opacity-0 group-hover:opacity-100 transition-opacity duration-300 `} />
                     
                     {/* Content */}
-                    <div className="relative z-10 text-center">
+                    <div className="relative z-10 text-center scale-90">
                       <div className="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">
                         {mood.emoji}
                       </div>
-                      <div className="text-white font-bold text-lg mb-2 drop-shadow-md font-heading">
+                      <div className="text-white font-bold text-md mb-2 drop-shadow-md font-heading">
                         {mood.label}
                       </div>
                       <div className="text-white/70 text-sm leading-relaxed font-body">
@@ -163,7 +163,7 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
                     )}
 
                     {/* Hover glow effect */}
-                    <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${mood.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl`} />
+                    <div className={`absolute inset-0  rounded-3xl bg-gradient-to-br ${mood.color}  opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl`} />
                   </button>
                 ))}
               </div>
@@ -196,11 +196,35 @@ export default function MoodPickerModal({ isOpen, onClose, onMoodSelect }) {
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           {getMoodTasks(selectedMood).map((task, i) => (
-                            <div key={i} className="flex items-center p-3 bg-white/10 rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300 group cursor-pointer">
-                              <span className="text-green-400 mr-3 text-lg group-hover:scale-110 transition-transform duration-300">✓</span>
-                              <span className="text-white/90 font-medium text-sm font-body">{task}</span>
+                            <div className="flex items-center justify-center p-3 bg-white/10 rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300 group cursor-pointer">
+                              <div key={i} >
+                                <span className="text-green-400 mr-3 text-lg group-hover:scale-110 transition-transform duration-300">✓</span>
+                                <span className="text-white/90 font-medium text-sm font-body">{task}</span>
+                              </div>
                             </div>
                           ))}
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="text-center space-y-4">
+                        <button className="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-3 rounded-xl border border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-lg backdrop-blur-sm font-ui">
+                          Start with {selectedMood.label.toLowerCase()} tasks →
+                        </button>
+                        
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                          <button 
+                            onClick={() => window.open('/signup', '_blank')}
+                            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg font-ui"
+                          >
+                            Sign Up for Full Experience
+                          </button>
+                          <button 
+                            onClick={() => window.open('https://discord.gg/eZHfGJTRNh', '_blank')}
+                            className="glass-button text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg font-ui"
+                          >
+                            Join Our Community
+                          </button>
                         </div>
                       </div>
                     </div>
