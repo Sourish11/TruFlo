@@ -1,14 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
+//Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCD3dyrSryvlRYj6uqNpWjB4liAvoNb9I8",
-  authDomain: "truflo-ecae1.firebaseapp.com",
-  projectId: "truflo-ecae1",
-  storageBucket: "truflo-ecae1.firebasestorage.app",
-  messagingSenderId: "314020150425",
-  appId: "1:314020150425:web:f73a88deb06fb940c28c08",
-  measurementId: "G-CBPRZF9S09"
+  apiKey: "AIzaSyCbPRY4e1vGdzyMWtm-SY-oYUPkB_YVhz0",
+  authDomain: "user-emails-database-truflo.firebaseapp.com",
+  projectId: "user-emails-database-truflo",
+  storageBucket: "user-emails-database-truflo.appspot.com",
+  messagingSenderId: "363592856594",
+  appId: "1:363592856594:web:7d50fa971d92b33a4c14cb",
+  measurementId: "G-CLF7K39EFY"
 };
 
 export const app = initializeApp(firebaseConfig);

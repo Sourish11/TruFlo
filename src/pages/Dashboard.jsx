@@ -5,9 +5,8 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import MoodPickerModal from "../components/ui/MoodPickerModal";
 import FocusTimer from "../components/ui/FocusTimer";
-import SmartTaskAI from "../components/ui/SmartTaskAI";
 import ProgressGraph from "../components/ui/ProgressGraph";
-import SmartTasksPanel from "../components/SmartTasksPanel";
+import TaskManager from "../components/TaskManager";
 import { useFocusTimer } from "../hooks/useFocusTimer";
 import trufloLogo from "../assets/truflo-logo.png";
 
@@ -16,7 +15,6 @@ export default function Dashboard() {
   const [currentMood, setCurrentMood] = useState(null);
   const [showMoodPicker, setShowMoodPicker] = useState(false);
   const [showFocusTimer, setShowFocusTimer] = useState(false);
-  const [showSmartTaskAI, setShowSmartTaskAI] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [quickGoal, setQuickGoal] = useState("");
   const [isGeneratingTasks, setIsGeneratingTasks] = useState(false);
@@ -545,23 +543,18 @@ export default function Dashboard() {
         </div>
       </Card>
 
-      {/* Smart Tasks Panel with AI Integration */}
-      <SmartTasksPanel
+      {/* Task Manager - Simple and Reliable */}
+      <TaskManager
         userId={user?.uid || "demo-user"}
-        onTasksApplied={(todayTasks) => {
-          // Integrate today's tasks with existing dashboard tasks
-          const newTasks = todayTasks.map((task) => ({
+        onTasksApplied={(focusTasks) => {
+          // Integrate focus tasks with existing dashboard tasks
+          const newTasks = focusTasks.map((task) => ({
             ...task,
             status: "pending",
             isAIGenerated: true,
-            energy:
-              task.difficulty === "easy"
-                ? "low-energy"
-                : task.difficulty === "hard"
-                  ? "high-energy"
-                  : "focused",
-            duration: task.estimatedMinutes,
-            xpReward: task.xp,
+            energy: "focused",
+            duration: 30, // Default 30 minutes
+            xpReward: task.xpEarned,
             canComplete: false,
           }));
 
@@ -718,68 +711,6 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Calendar-Based Scheduling */}
-      <Card className="p-6">
-        <h2 className="text-xl font-bold text-white mb-4 font-heading">
-          📅 Smart Scheduling
-        </h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-white mb-2">Available Time Today</h3>
-            <div className="flex space-x-2 mb-4">
-              <Input
-                type="time"
-                placeholder="Start time"
-                value={availableTimeSlot.start}
-                onChange={(e) =>
-                  setAvailableTimeSlot((prev) => ({
-                    ...prev,
-                    start: e.target.value,
-                  }))
-                }
-              />
-              <Input
-                type="time"
-                placeholder="End time"
-                value={availableTimeSlot.end}
-                onChange={(e) =>
-                  setAvailableTimeSlot((prev) => ({
-                    ...prev,
-                    end: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <Button onClick={handleScheduleTasks} className="w-full">
-              📋 Auto-Schedule Tasks
-            </Button>
-          </div>
-
-          {schedule.length > 0 && (
-            <div>
-              <h3 className="text-white mb-2">Your Schedule</h3>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {schedule.map((task, index) => (
-                  <div key={index} className="p-2 bg-white/5 rounded text-sm">
-                    <div className="text-white font-medium">{task.title}</div>
-                    <div className="text-white/60">
-                      {task.scheduledStart?.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}{" "}
-                      -
-                      {task.scheduledEnd?.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </Card>
 
       {/* Progress Analytics */}
       <ProgressGraph />
@@ -801,18 +732,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card
-          hover
-          className="cursor-pointer"
-          onClick={() => setShowSmartTaskAI(true)}
-        >
-          <CardContent className="p-6 text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-400/30 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">✨</span>
-            </div>
-            <h3 className="font-semibold text-white font-heading">AI Tasks</h3>
-          </CardContent>
-        </Card>
 
         <Card hover className="cursor-pointer">
           <CardContent className="p-6 text-center">
@@ -828,7 +747,7 @@ export default function Dashboard() {
         <Card hover className="cursor-pointer">
           <CardContent className="p-6 text-center">
             <div className="w-12 h-12 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-400/30 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">📊</span>
+              <span className="text-2xl">���</span>
             </div>
             <h3 className="font-semibold text-white font-heading">
               Leaderboard
@@ -1008,46 +927,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Smart Task AI Modal */}
-      {showSmartTaskAI && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-2xl mx-auto p-6">
-            <Card className="glass-enhanced shadow-2xl border-2 border-white/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-semibold text-white font-heading">
-                    ✨ AI Smart Task Planner
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowSmartTaskAI(false)}
-                  >
-                    ×
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SmartTaskAI
-                  onTasksGenerated={(aiTasks) => {
-                    const enhancedTasks = aiTasks.map((task) => ({
-                      ...task,
-                      status: "pending",
-                      lockedXP: 0,
-                      startTime: null,
-                      canComplete: false,
-                      energy: task.energy || "focused",
-                    }));
-                    setTasks((prev) => [...prev, ...enhancedTasks]);
-                    setShowSmartTaskAI(false);
-                  }}
-                  userProfile={{ focusLength: 25, mood: currentMood }}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

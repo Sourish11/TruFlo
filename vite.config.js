@@ -10,22 +10,29 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+    build: {
+    // Optimize for Vercel deployment
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split vendor libraries
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          animation: ['framer-motion'],
+          charts: ['recharts']
+        }
+      }
+    }
+  },
   server: {
     proxy: {
-      // Proxy frontend calls to local LLaMA 3.1 API running through ngrok
-      "/api/llama": {
-        target: "https://together-polecat-strictly.ngrok-free.app", // ← Your working ngrok endpoint
+      "/api/gemini-proxy": {
+        target: "https://generativelanguage.googleapis.com",
         changeOrigin: true,
-        secure: false, // ← disables SSL verification (required for ngrok)
-        rewrite: (path) => path.replace(/^\/api\/llama/, "/api/generate"),
-        configure: (proxy, options) => {
-          proxy.on("proxyReq", (proxyReq, req, res) => {
-            // Add ngrok headers to bypass warning page
-            proxyReq.setHeader("ngrok-skip-browser-warning", "true");
-            proxyReq.setHeader("User-Agent", "TruFlo-App/1.0");
-          });
-        },
-      },
+        secure: true,
+        rewrite: () => `/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY || ''}`,
+      }
     },
   },
 });

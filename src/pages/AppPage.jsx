@@ -1,6 +1,7 @@
 import { getAuth, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { Button } from "../components/ui/Button";
 import OnboardingModal from "../components/ui/OnboardingModal";
@@ -8,11 +9,11 @@ import trufloLogo from "../assets/truflo-logo.png";
 
 const sections = [
   { key: "dashboard", label: "Dashboard", icon: "🏠" },
-  { key: "tasks", label: "Smart Tasks", icon: "✨" },
+  { key: "tasks", label: "Tasks", icon: "📋" },
   { key: "calendar", label: "Calendar", icon: "📅" },
   { key: "focus", label: "Focus", icon: "🎯" },
   { key: "challenges", label: "Challenges", icon: "🏆" },
-  { key: "leaderboard", label: "Leaderboard", icon: "📊" },
+  { key: "leaderboard", label: "Leaderboard", icon: "🏆" },
   { key: "profile", label: "Profile", icon: "👤" },
   { key: "settings", label: "Settings", icon: "⚙️" },
 ];
@@ -277,11 +278,6 @@ export default function AppPage() {
                   {section.icon}
                 </span>
                 <span className="font-medium">{section.label}</span>
-                {section.key === "tasks" && (
-                  <span className="ml-auto px-2 py-1 bg-purple-500/30 text-purple-300 text-xs rounded-full">
-                    AI
-                  </span>
-                )}
               </NavLink>
             ))}
           </nav>

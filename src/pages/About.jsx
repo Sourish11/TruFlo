@@ -46,8 +46,8 @@ export default function About() {
               {[
                 { name: 'Sourish Kumar', role: 'Founder & CEO', emoji: '👨‍💼' },
                 { name: 'Freddie Letzer', role: 'Co-Founder & CFO', emoji: '💼' },
-                { name: 'Leo Nguyen', role: 'Backend Dev', emoji: '💻' },
-                { name: 'David Nguyen', role: 'Backend Dev ', emoji: '🎨' }
+                { name: 'Leo Nguyen', role: 'Web Developer', emoji: '💻' },
+                { name: 'David Nguyen', role: 'UI/UX Developer', emoji: '🎨' }
               ].map((member, index) => (
                 <div key={index} className="glass-card p-6 rounded-xl text-center hover">
                   <div className="text-4xl mb-4">{member.emoji}</div>

@@ -1,109 +1,98 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useCallback } from "react";
 
 export function useFocusTimer(task) {
   const [isActive, setIsActive] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0); // in seconds
-  const [startTime, setStartTime] = useState(null);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const startTimeRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // Start the timer
-  const startTimer = () => {
-    if (!isActive) {
-      setIsActive(true);
-      setStartTime(Date.now() - (elapsedTime * 1000)); // Account for any previous elapsed time
-    }
-  };
+  const startTimer = useCallback(() => {
+    if (!task) return;
 
-  // Pause the timer
-  const pauseTimer = () => {
+    startTimeRef.current = performance.now();
+    setIsActive(true);
+    setTimeElapsed(0);
+
+    intervalRef.current = setInterval(() => {
+      if (startTimeRef.current) {
+        const elapsed = Math.floor(
+          (performance.now() - startTimeRef.current) / 1000,
+        );
+        setTimeElapsed(elapsed);
+      }
+    }, 1000);
+  }, [task]);
+
+  const stopTimer = useCallback(() => {
+    if (!isActive || !startTimeRef.current || !task) return null;
+
+    const actualMs = performance.now() - startTimeRef.current;
+    const expectedMs = task.estimatedMinutes * 60 * 1000;
+
+    // Calculate XP: full XP if completed within expected time,
+    // partial XP if it took longer (but minimum 50% XP)
+    const timeRatio = Math.min(1, expectedMs / actualMs);
+    const earnedXp = Math.max(
+      Math.floor(task.xp * 0.5),
+      Math.floor(task.xp * timeRatio),
+    );
+
     setIsActive(false);
-  };
-
-  // Stop the timer and calculate results
-  const stopTimer = () => {
-    setIsActive(false);
-    
-    if (!task) {
-      return null;
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
-
-    const actualMinutes = Math.round(elapsedTime / 60);
-    const expectedMinutes = task.estimatedMinutes || task.duration || 25;
-    
-    // Calculate efficiency (how close to expected time)
-    const efficiency = Math.min(100, Math.max(0, 100 - Math.abs(actualMinutes - expectedMinutes) * 5));
-    
-    // Calculate XP based on task difficulty and efficiency
-    const baseXP = task.xp || task.xpReward || 25;
-    const efficiencyMultiplier = efficiency / 100;
-    const earnedXP = Math.round(baseXP * efficiencyMultiplier);
 
     const result = {
-      actualMinutes,
-      expectedMinutes,
-      efficiency,
-      earnedXP,
-      completed: true
+      actualMs,
+      actualMinutes: Math.floor(actualMs / 60000),
+      expectedMinutes: task.estimatedMinutes,
+      earnedXp,
+      efficiency: timeRatio,
+      task: task,
     };
 
-    // Reset timer
-    setElapsedTime(0);
-    setStartTime(null);
+    startTimeRef.current = null;
+    setTimeElapsed(0);
 
     return result;
-  };
+  }, [isActive, task]);
 
-  // Reset the timer
-  const resetTimer = () => {
-    setIsActive(false);
-    setElapsedTime(0);
-    setStartTime(null);
-  };
-
-  // Update elapsed time when timer is active
-  useEffect(() => {
-    if (isActive && startTime) {
-      intervalRef.current = setInterval(() => {
-        const now = Date.now();
-        const elapsed = Math.floor((now - startTime) / 1000);
-        setElapsedTime(elapsed);
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+  const pauseTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+    setIsActive(false);
+  }, []);
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isActive, startTime]);
+  const resetTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setIsActive(false);
+    setTimeElapsed(0);
+    startTimeRef.current = null;
+  }, []);
 
-  // Format time as MM:SS
-  const formatTime = (seconds) => {
+  // Format time for display
+  const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Calculate progress percentage if task has expected duration
-  const getProgress = () => {
-    if (!task || !task.estimatedMinutes) return 0;
-    const expectedSeconds = task.estimatedMinutes * 60;
-    return Math.min(100, (elapsedTime / expectedSeconds) * 100);
-  };
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }, []);
 
   return {
     isActive,
-    elapsedTime,
-    formattedTime: formatTime(elapsedTime),
-    progress: getProgress(),
+    timeElapsed,
+    formattedTime: formatTime(timeElapsed),
     startTimer,
-    pauseTimer,
     stopTimer,
-    resetTimer
+    pauseTimer,
+    resetTimer,
+    progress: task
+      ? Math.min(100, (timeElapsed / (task.estimatedMinutes * 60)) * 100)
+      : 0,
   };
 }

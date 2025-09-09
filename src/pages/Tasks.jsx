@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import TaskManager from '../components/ui/TaskManager';
-import SmartTaskAI from '../components/ui/SmartTaskAI';
+import PlanGenerator from '../components/ui/PlanGenerator';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
@@ -52,19 +52,15 @@ export default function Tasks() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-4 font-heading">
-          Smart Task Management
-        </h1>
-        <p className="text-white/80 font-body">
-          AI-powered task breakdown with mood-adaptive recommendations
-        </p>
+        <h1 className="text-3xl font-bold text-white mb-4 font-heading">Smart Task Management</h1>
+        <p className="text-white/80 font-body">Gemini-powered flow-state plans with strict JSON schema</p>
       </div>
 
-      {/* AI Task Generator */}
-      <SmartTaskAI 
-        onTasksGenerated={handleAITasksGenerated}
-        userProfile={userProfile}
-      />
+      {/* Flow-State Plan Generator */}
+      <PlanGenerator onImportTasks={(aiTasks) => {
+        const updated = [...tasks, ...aiTasks];
+        handleTasksChange(updated);
+      }} />
 
       {/* Task Manager */}
       <TaskManager

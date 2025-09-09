@@ -1,5 +1,3 @@
-import { db } from "../../firebase";
-import { collection, addDoc, getDocs, onSnapshot } from "firebase/firestore";
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere, Html, Points, PointMaterial } from '@react-three/drei';
@@ -641,7 +639,7 @@ export default function Interactive3DEarth() {
     }
   }, []);
 
-  const handleSubmitMood = async () => {
+  const handleSubmitMood = () => {
     if (!selectedCountry || !selectedMood) return;
     
     const newMood = {
@@ -650,28 +648,17 @@ export default function Interactive3DEarth() {
       mood: selectedMood,
       timestamp: Date.now()
     };
-
+    
     const updatedMoods = [...userMoods, newMood];
     setUserMoods(updatedMoods);
-
-    // Save mood data locally
+    
+    // Save mood data
     localStorage.setItem('earthUserMoods', JSON.stringify(updatedMoods));
-
-    // Save to Firestore
-    try {
-      await addDoc(collection(db, "globalMoods"), {
-        country: selectedCountry,
-        mood: selectedMood,
-        timestamp: new Date()
-      });
-    } catch (err) {
-      console.error("Failed to save mood to Firestore:", err);
-    }
-
+    
     // Reset form
     setSelectedCountry('');
     setSelectedMood('');
-
+    
     // Trigger small celebration
     if (window.confetti) {
       window.confetti({
@@ -682,17 +669,7 @@ export default function Interactive3DEarth() {
       });
     }
   };
-  const [globalMoodCount, setGlobalMoodCount] = useState(0);
 
-  useEffect(() => {
-    // Listen for real-time updates to global mood submissions
-    const unsubscribe = onSnapshot(collection(db, "globalMoods"), (snapshot) => {
-      setGlobalMoodCount(snapshot.size);
-    });
-
-    return () => unsubscribe();
-  }, []); // refetch when local moods change
-    
   const handleUnlock = () => {
     setIsUnlocked(true);
   };
@@ -809,7 +786,7 @@ export default function Interactive3DEarth() {
               {/* Total submissions counter */}
               <div className="text-center">
                 <div className="text-white/60 text-xs font-body">
-                  🌍 Total global mood submissions: <span className="font-semibold text-white font-ui">{globalMoodCount}</span>
+                  🌍 Total global mood submissions: <span className="font-semibold text-white font-ui">{userMoods.length}</span>
                 </div>
               </div>
             </div>
