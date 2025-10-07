@@ -4,7 +4,7 @@ if (!key) {
   process.exit(1);
 }
 
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`;
+const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`;
 
 const payload = {
   contents: [
@@ -12,10 +12,7 @@ const payload = {
       role: 'user',
       parts: [{ text: 'Return a JSON object with key message set to Hello.' }]
     }
-  ],
-  generationConfig: {
-    response_mime_type: 'application/json'
-  }
+  ]
 };
 
 (async () => {

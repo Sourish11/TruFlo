@@ -63,14 +63,14 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { prompt, model = "gemini-1.5-flash", system, schema, generationConfig } = body || {};
+  const { prompt, model = "gemini-2.5-flash", system, schema, generationConfig } = body || {};
 
   if (!prompt || typeof prompt !== "string") {
     res.status(400).json({ error: { message: "prompt (string) is required" } });
     return;
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
 
   const parts = [];
   if (system && typeof system === "string") {
@@ -90,10 +90,6 @@ export default async function handler(req, res) {
         parts,
       },
     ],
-    generationConfig: {
-      response_mime_type: "application/json",
-      ...(generationConfig || {}),
-    },
   };
 
   try {
