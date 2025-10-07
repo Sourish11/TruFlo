@@ -57,10 +57,13 @@ export default function Tasks() {
       </div>
 
       {/* Flow-State Plan Generator */}
-      <PlanGenerator onImportTasks={(aiTasks) => {
-        const updated = [...tasks, ...aiTasks];
-        handleTasksChange(updated);
-      }} />
+      <PlanGenerator
+        mood={currentMood?.label}
+        onImportTasks={(aiTasks) => {
+          const updated = [...tasks, ...aiTasks];
+          handleTasksChange(updated);
+        }}
+      />
 
       {/* Task Manager */}
       <TaskManager

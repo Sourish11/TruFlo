@@ -5,11 +5,17 @@ import { Input } from './Input';
 import { generatePlan } from '../../services/geminiService';
 
 function to12Hour(time) {
-  // time: HH:MM
-  const [h, m] = time.split(':').map((v) => parseInt(v, 10));
+  // Accepts HH:MM; guards against invalid or empty values
+  if (!time || typeof time !== 'string') time = '15:00';
+  const parts = time.split(':');
+  let h = parseInt(parts[0], 10);
+  let m = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+  if (Number.isNaN(h)) h = 15;
+  if (Number.isNaN(m)) m = 0;
   const suffix = h >= 12 ? 'pm' : 'am';
-  const hour = ((h + 11) % 12) + 1;
-  return `${hour}:${m.toString().padStart(2, '0')} ${suffix}`;
+  let hour = h % 12;
+  if (hour === 0) hour = 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
 }
 
 function durationText(days) {
@@ -21,7 +27,7 @@ function durationText(days) {
   return `${days} days`;
 }
 
-export default function PlanGenerator({ onImportTasks }) {
+export default function PlanGenerator({ onImportTasks, mood }) {
   const [userInput, setUserInput] = useState('');
   const [days, setDays] = useState(7);
   const [startTime, setStartTime] = useState('15:00');
@@ -29,15 +35,17 @@ export default function PlanGenerator({ onImportTasks }) {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState(null);
   const [error, setError] = useState('');
+  const [visibleWeeks, setVisibleWeeks] = useState(1);
 
   const handleGenerate = async () => {
     if (!userInput.trim()) return;
     setLoading(true);
     setError('');
+    setVisibleWeeks(1);
     const duration = durationText(days);
     const timeWindow = `${to12Hour(startTime)} - ${to12Hour(endTime)}`;
     try {
-      const res = await generatePlan({ userInput, duration, timeWindow });
+      const res = await generatePlan({ userInput, duration, timeWindow, dayCount: days, moodLabel: mood });
       setPlan(res);
     } catch (e) {
       setError(e?.message || 'Failed to generate plan');
@@ -98,6 +106,7 @@ export default function PlanGenerator({ onImportTasks }) {
                   <span key={i} className="inline-block px-2 py-1 text-xs bg-white/5 border border-white/10 rounded mr-1 text-white/70">Day {i + 1}</span>
                 ))}
               </div>
+              <div className="text-xs text-white/60 mt-1">Requested: {days} days</div>
             </div>
             <div>
               <label className="block text-sm font-medium text-white/90 mb-2">Time Window</label>
@@ -127,25 +136,50 @@ export default function PlanGenerator({ onImportTasks }) {
             <div className="space-y-4">
               <div className="p-3 bg-white/5 rounded border border-white/10">
                 <div className="text-white font-medium">{plan.plan_title}</div>
+                {Array.isArray(plan.days) && (
+                  <div className="text-xs text-white/60 mt-1">Showing {Math.min(visibleWeeks * 7, plan.days.length)} of {plan.days.length} generated days</div>
+                )}
               </div>
-              {plan.days.map((day, i) => (
-                <div key={i} className="p-4 bg-white/5 rounded border border-white/10">
-                  <div className="text-white font-semibold mb-2">{day.day_title}</div>
-                  <div className="space-y-3">
-                    {day.tasks.map((t, j) => (
-                      <div key={j} className="p-3 rounded bg-white/5 border border-white/10">
-                        <div className="flex items-center justify-between">
-                          <div className="text-white font-medium">{t.title}</div>
-                          <div className="text-xs text-white/60">{t.time_slot} • {t.duration}m • {t.difficulty} • {t.xp} XP</div>
+              {(() => {
+                const totalDays = Array.isArray(plan.days) ? plan.days.length : 0;
+                const totalWeeks = Math.ceil(totalDays / 7) || 1;
+                const visibleDays = Math.min(totalDays, visibleWeeks * 7);
+                return (
+                  <>
+                    {plan.days.slice(0, visibleDays).map((day, i) => {
+                      const xpTotal = (day.tasks || []).reduce((s, t) => s + (t?.xp || 0), 0);
+                      const isFinal = i === visibleDays - 1 && visibleDays === plan.days.length;
+                      const milestone = i === 2 ? 'Halfway there 🚀' : (isFinal ? 'Boss Fight / Wrap-Up Challenge' : null);
+                      return (
+                      <div key={i} className="p-4 bg-white/5 rounded border border-white/10">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-white font-semibold">{day.day_title}</div>
+                          <div className="text-xs text-white/70">XP planned: {xpTotal} • Streak: Day {i + 1}</div>
                         </div>
-                        <ul className="mt-2 list-disc list-inside text-white/80 text-sm space-y-1">
-                          {t.steps.map((s, k) => (<li key={k}>{s}</li>))}
-                        </ul>
+                        {milestone && (
+                          <div className="text-xs text-emerald-300 mb-2">{milestone}</div>
+                        )}
+                        <div className="space-y-3">
+                          {day.tasks.map((t, j) => (
+                            <div key={j} className="p-3 rounded bg-white/5 border border-white/10">
+                              <div className="flex items-center justify-between">
+                                <div className="text-white font-medium">{t.title}</div>
+                                <div className="text-xs text-white/60">{t.time_slot} • {t.duration}m • {t.difficulty} • {t.xp} XP</div>
+                              </div>
+                              <ul className="mt-2 list-disc list-inside text-white/80 text-sm space-y-1">
+                                {t.steps.map((s, k) => (<li key={k}>{s}</li>))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                    )})}
+                    {totalWeeks > visibleWeeks && (
+                      <Button onClick={() => setVisibleWeeks(v => Math.min(v + 1, totalWeeks))} className="w-full">Show Next Week</Button>
+                    )}
+                  </>
+                );
+              })()}
 
               <div className="p-3 bg-white/5 rounded border border-white/10 text-sm text-white/80">
                 <div>Total Tasks: {plan.summary.total_tasks}</div>
