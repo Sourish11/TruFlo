@@ -51,7 +51,7 @@ export async function generateSubtasks(taskDescription, dueDate, userProfile) {
   const res = await fetch('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, model: 'gemini-1.5-flash' })
+    body: JSON.stringify({ prompt, model: 'gemini-2.5-flash' })
   });
 
   const data = await res.json().catch(() => null);
@@ -153,7 +153,7 @@ Realism & Flexibility
 
 Engagement & Gamification
 - Show daily XP totals and streak day number.
-- Milestones: Day 3 → “Halfway there 🚀”; Final Day → “Boss Fight / Wrap-Up Challenge”.
+- Milestones: Day 3 → “Halfway there 🚀”; Final Day → “Boss Fight / Wrap-Up Challenge���.
 
 Verification Policy
 - Core/Deep tasks → include a verification step (test run, commit, self-quiz).
@@ -187,14 +187,8 @@ Verification Policy
     body: JSON.stringify({
       prompt,
       system,
-      model: 'gemini-1.5-flash',
-      schema: JSON.stringify(jsonSchema),
-      generationConfig: {
-        response_mime_type: 'application/json',
-        temperature: 0.3,
-        topP: 0.8,
-        maxOutputTokens: 4096
-      }
+      model: 'gemini-2.5-flash',
+      schema: JSON.stringify(jsonSchema)
     })
   });
 
@@ -207,8 +201,7 @@ Verification Policy
         contents: [{ role: 'user', parts: [
           { text: system },
           { text: `${prompt}\n\nJSON Schema (enforce strictly):\n${JSON.stringify(jsonSchema)}` }
-        ] }],
-        generationConfig: { response_mime_type: 'application/json', temperature: 0.3, topP: 0.8, maxOutputTokens: 4096 }
+        ] }]
       })
     });
   }

@@ -31,7 +31,7 @@ export default defineConfig({
         target: "https://generativelanguage.googleapis.com",
         changeOrigin: true,
         secure: true,
-        rewrite: () => `/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY || ''}`,
+        rewrite: () => `/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY || ''}`,
       }
     },
   },
